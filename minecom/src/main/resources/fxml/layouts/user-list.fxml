@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      prefWidth="350"
+      minHeight="700"
+      spacing="0"
+      fx:controller="com.mining.minecom.controller.UserListController"
+      styleClass="user-list">
+
+    <VBox styleClass="topUser-list">
+        <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" styleClass="search-box-user">
+            <FontIcon iconLiteral="fas-search" iconSize="14" iconColor="#888"/>
+            <TextField fx:id="searchFiedUser"
+                       styleClass="search-field-user"
+                       promptText="Rechercher des users ou messages ..."
+                       HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <HBox alignment="TOP_CENTER" spacing="5">
+            <Button text="Toutes"/>
+            <Button text="Favoris"/>
+            <Button text="Non lues"/>
+            <Button text="Equipes"/>
+        </HBox>
+    </VBox>
+
+    <ScrollPane fx:id="userListScroll"
+                fitToWidth="true"
+                hbarPolicy="NEVER"
+                VBox.vgrow="ALWAYS"
+                styleClass="user-list-scroll">
+
+        <ListView fx:id="userListView"
+                  styleClass="user-list-view"
+                  minHeight="600"/>
+    </ScrollPane>
+</VBox>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      spacing="8"
+      alignment="TOP_CENTER"
+      styleClass="navbar"
+      fx:controller="com.mining.minecom.controller.NavBarController">
+
+    <padding>
+        <Insets top="10" bottom="10"/>
+    </padding>
+
+    <!-- 🔑 BOUTON SOS EN HAUT -->
+    <Button fx:id="sosBtn"
+            onAction="#handleSOS"
+            styleClass="sos-button">
+        <graphic>
+            <FontIcon iconLiteral="fas-exclamation-triangle"
+                      iconSize="24"
+                      iconColor="white"/>
+        </graphic>
+        <tooltip>
+            <Tooltip text="ALERTE SOS"/>
+        </tooltip>
+    </Button>
+
+    <!-- Séparateur -->
+    <VBox prefHeight="20"/>
+
+    <!-- SECTION HAUT : Messages & People -->
+    <VBox spacing="8" alignment="TOP_CENTER">
+        <Button fx:id="messagesBtn" onAction="#showMessages" styleClass="nav-button">
+            <graphic>
+                <FontIcon iconLiteral="fas-comments" iconSize="20" styleClass="nav-icon"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Messages"/>
+            </tooltip>
+        </Button>
+
+        <Button fx:id="contactsBtn" onAction="#showContacts" styleClass="nav-button">
+            <graphic>
+                <FontIcon iconLiteral="fas-users" iconSize="20" styleClass="nav-icon"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Contacts"/>
+            </tooltip>
+        </Button>
+    </VBox>
+
+    <Separator/>
+
+    <!-- SECTION MILIEU : Appels, Notifications, etc. -->
+    <VBox spacing="8" alignment="TOP_CENTER">
+        <Button fx:id="callsBtn" onAction="#showCalls" styleClass="nav-button">
+            <graphic>
+                <FontIcon iconLiteral="fas-phone" iconSize="20" styleClass="nav-icon"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Appels"/>
+            </tooltip>
+        </Button>
+
+        <Button fx:id="notificationsBtn" onAction="#showNotifications" styleClass="nav-button">
+            <graphic>
+                <FontIcon iconLiteral="fas-bell" iconSize="20" styleClass="nav-icon"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Notifications"/>
+            </tooltip>
+        </Button>
+
+        <Button fx:id="tasksBtn" onAction="#showTasks" styleClass="nav-button">
+            <graphic>
+                <FontIcon iconLiteral="fas-tasks" iconSize="20" styleClass="nav-icon"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Tâches"/>
+            </tooltip>
+        </Button>
+    </VBox>
+
+    <!-- Spacer -->
+    <Separator VBox.vgrow="ALWAYS" style="-fx-opacity: 0;"/>
+
+    <!-- 🔑 SECTION BAS : Settings & Profile avec avatar dynamique -->
+    <VBox spacing="8" alignment="BOTTOM_CENTER">
+        <Button fx:id="settingsBtn" onAction="#showSettings" styleClass="nav-button">
+            <graphic>
+                <FontIcon iconLiteral="fas-cog" iconSize="20" styleClass="nav-icon"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Paramètres"/>
+            </tooltip>
+        </Button>
+
+        <!-- 🔑 Avatar avec StackPane au lieu d'ImageView -->
+        <Button fx:id="profileBtn" onAction="#showProfile" styleClass="nav-button-profile">
+            <graphic>
+                <StackPane fx:id="profileAvatar"
+                           prefWidth="36"
+                           prefHeight="36"
+                           minWidth="36"
+                           minHeight="36"
+                           maxWidth="36"
+                           maxHeight="36"
+                           styleClass="profile-avatar"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Mon profil"/>
+            </tooltip>
+        </Button>
+    </VBox>
+
+</VBox>

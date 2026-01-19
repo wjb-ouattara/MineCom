@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mining.minecom.controller.LoginController"
+            styleClass="login-root">
+
+    <top>
+        <HBox fx:id="titleBar" styleClass="title-bar" alignment="CENTER_LEFT">
+            <ImageView fx:id="icon" fitWidth="20" fitHeight="20" pickOnBounds="true">
+                <image>
+                    <Image url="@../images/EDV.png" />
+                </image>
+            </ImageView>
+            <Label text="MineCom – Communication Opérationnelle" styleClass="title-text"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="—" onAction="#minimizeWindow" styleClass="title-button-mini"/>
+            <Button text="X" onAction="#closeWindow" styleClass="title-button-close"/>
+        </HBox>
+    </top>
+        <center>
+            <HBox fx:id="mainContentArea" alignment="CENTER">
+
+                <StackPane prefWidth="500">
+
+                    <ImageView fx:id="backgroundImg1" fitHeight="500" fitWidth="500" preserveRatio="false">
+                        <image>
+                            <Image url="@../images/Group 4@2x.jpg"/>
+                        </image>
+                    </ImageView>
+                    <VBox>
+                        <padding>
+                            <Insets top="20" right="20" left="20"/>
+                        </padding>
+                        <HBox alignment="TOP_RIGHT" spacing="10" styleClass="header-menu">
+                            <Pane HBox.hgrow="ALWAYS" />
+                            <Button fx:id="menuSignUpButton" text="Sign Up" styleClass="secondary-button" onAction="#showSignUpMode"/>
+                            <Button fx:id="menuLoginButton" text="Login" styleClass="login-button1" onAction="#showLoginMode"/>
+                        </HBox>
+
+                        <Pane VBox.vgrow="ALWAYS" />
+
+                        <VBox alignment="CENTER" spacing="0" styleClass="branding-content">
+                            <HBox alignment="CENTER" spacing="10">
+                                <Label text="Endeavour" styleClass="branding-title-line1"/>
+                                <Label text="Mining" styleClass="branding-title-line11"/>
+                            </HBox>
+                            <HBox alignment="CENTER" spacing="10">
+                                <Label text="Your" styleClass="branding-title-line2"/>
+                                <Label text="Company" styleClass="branding-title-line22"/>
+                            </HBox>
+                        </VBox>
+
+                        <Pane VBox.vgrow="ALWAYS" />
+                    </VBox>
+                </StackPane>
+
+
+                <StackPane prefWidth="350">
+                    <HBox.margin>
+                        <Insets left="-50"/>
+                    </HBox.margin>
+
+                    <ImageView fitHeight="500" fitWidth="350" preserveRatio="false">
+                        <image>
+                            <Image url="@../images/Group 5@2x.jpg"/>
+                        </image>
+                    </ImageView>
+
+                    <VBox fx:id="loginFormArea" styleClass="login-form-area" alignment="CENTER" prefWidth="350" spacing="20">
+                        <padding>
+                            <Insets top="40" left="40" right="40" bottom="40"/>
+                        </padding>
+                        <Label fx:id="titleLabel" text="Connexion" styleClass="login-title-word1"/>
+                        <Label fx:id="subtitleLabel" text="Accès au système" styleClass="login-title-word2"/>
+                        <TextField fx:id="usernameField" promptText="Nom d'utilisateur" styleClass="text-field" prefHeight="40"/>
+                        <PasswordField fx:id="passwordField" promptText="Mot de passe" styleClass="text-field" prefHeight="40"/>
+
+
+                        <VBox fx:id="signUpFields" spacing="20" managed="false" visible="false">
+
+                            <TextField fx:id="phoneField" promptText="Numéro de téléphone" styleClass="text-field" prefHeight="40"/>
+
+                            <VBox alignment="CENTER" spacing="5">
+                                <HBox alignment="CENTER" spacing="10">
+                                    <ImageView fx:id="profileImageView" fitWidth="60" fitHeight="60" preserveRatio="true" styleClass="profile-preview"/>
+                                    <Button text="Choisir Photo" onAction="#handleChoosePhoto" styleClass="profil-button"/>
+                                </HBox>
+                            </VBox>
+
+                        </VBox>
+
+
+                        <Button fx:id="actionButton" text="Login" onAction="#handleAction" styleClass="login-button" prefHeight="45" maxWidth="Infinity"/>
+
+                        <Hyperlink fx:id="bottomLink" text="Forgot Password?" onAction="#handleSwitchMode" styleClass="forgot-password-link"/>
+
+                    </VBox>
+
+                </StackPane>
+
+            </HBox>
+        </center>
+</BorderPane>

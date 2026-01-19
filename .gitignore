@@ -1,0 +1,15 @@
+# Java / Maven
+target/
+*.class
+*.log
+
+# IntelliJ
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# JavaFX
+*.jpackage

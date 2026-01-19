@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.Image?>
+
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mining.minecom.controller.DashboardController"
+            styleClass="dashboard"
+            prefHeight="800"
+            prefWidth="1400">
+
+    <top>
+        <HBox fx:id="titleBar"
+              styleClass="title-bar"
+              alignment="CENTER_LEFT">
+            <ImageView fx:id="icon" fitWidth="20" fitHeight="20" styleClass="mineIcon" />
+            <Label text="MineCom" styleClass="title-text"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button onAction="#minimizeWindow" styleClass="title-button-mini">
+                <graphic>
+                    <FontIcon iconLiteral="fas-minus" iconSize="12" iconColor="white"/>
+                </graphic>
+            </Button>
+            <StackPane fx:id="maximizeContainer">
+                <Button fx:id="maximizeBtn" onAction="#maximizeWindow" styleClass="title-button-max">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-square" iconSize="12" iconColor="white"/>
+                    </graphic>
+                </Button>
+            </StackPane>
+            <Button onAction="#closeWindow" styleClass="title-button-close">
+                <graphic>
+                    <FontIcon iconLiteral="fas-times" iconSize="14" iconColor="white"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </top>
+
+    <center>
+        <!-- 🔑 AJOUT : prefHeight pour forcer la hauteur -->
+        <HBox prefHeight="750">
+            <fx:include fx:id="sidebar" source="layouts/sidebar.fxml"/>
+
+            <StackPane fx:id="mainArea"
+                       styleClass="main-area"
+                       HBox.hgrow="ALWAYS">
+
+                <ImageView fx:id="bgImage"
+                           opacity="0.7"
+                           smooth="true"
+                           cache="true"/>
+
+                <VBox>
+                    <fx:include fx:id="topbar" source="layouts/topbar.fxml"/>
+
+                    <ScrollPane fitToWidth="true"
+                                hbarPolicy="NEVER"
+                                vbarPolicy="AS_NEEDED"
+                                styleClass="chat-scroll"
+                                VBox.vgrow="ALWAYS">
+                        <VBox fx:id="chatContainer"
+                              spacing="10">
+                            <padding>
+                                <Insets top="15" right="40" bottom="15" left="40"/>
+                            </padding>
+                        </VBox>
+                    </ScrollPane>
+
+                    <HBox spacing="10" styleClass="message-box" alignment="CENTER">
+                        <padding>
+                            <Insets right="20" bottom="20" left="20"/>
+                        </padding>
+
+                        <ComboBox fx:id="messageTypeSelector"
+                                  promptText="Type"
+                                  styleClass="type-selector"
+                                  prefWidth="140"/>
+
+                        <TextArea fx:id="messageInput"
+                                  wrapText="true"
+                                  prefRowCount="1"
+                                  maxHeight="150"
+                                  promptText="Taper votre message..."
+                                  HBox.hgrow="ALWAYS"
+                                  styleClass="messageField"/>
+
+                        <Button onAction="#handleSendMessage" styleClass="sendButton">
+                            <graphic>
+                                <FontIcon iconLiteral="fas-paper-plane" iconSize="18"/>
+                            </graphic>
+                        </Button>
+                    </HBox>
+                </VBox>
+            </StackPane>
+
+            <padding>
+                <Insets top="8" right="35" bottom="20" left="10"/>
+            </padding>
+        </HBox>
+    </center>
+</BorderPane>

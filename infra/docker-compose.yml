@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: minecom-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: minecom
+      POSTGRES_USER: minecom_user
+      POSTGRES_PASSWORD: minecom_pass
+    ports:
+      - "5433:5433"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

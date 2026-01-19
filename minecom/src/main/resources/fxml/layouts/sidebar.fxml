@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      spacing="5"
+      minWidth="400"
+      maxWidth="400"
+      prefWidth="400"
+      styleClass="sidebar"
+      fx:controller="com.mining.minecom.controller.SidebarController">
+
+    <VBox styleClass="nagiv-bar">
+        <fx:include fx:id="navBar" source="NavBar.fxml"/>
+    </VBox>
+
+    <!-- 🔑 SUPPRESSION du VBox wrapper -->
+    <fx:include fx:id="userList"
+                source="user-list.fxml"
+                HBox.hgrow="ALWAYS"/>
+</HBox>

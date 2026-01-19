@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:id="topbar"
+      fx:controller="com.mining.minecom.controller.TopbarController"
+      spacing="15"
+      alignment="CENTER_LEFT"
+      prefHeight="60"
+      minHeight="60"
+      maxHeight="60"
+      styleClass="topbar">
+    <padding>
+        <Insets top="5" right="15" bottom="5" left="15"/>
+    </padding>
+
+    <!-- ===== ZONE GAUCHE (profil utilisateur) ===== -->
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <!-- 🔑 CHANGEMENT : StackPane au lieu de ImageView -->
+        <StackPane fx:id="avatarContainer"
+                   prefWidth="40"
+                   prefHeight="40"
+                   minWidth="40"
+                   minHeight="40"
+                   maxWidth="40"
+                   maxHeight="40"/>
+
+        <VBox spacing="2">
+            <Label fx:id="userName"
+                   text="Sélectionner un contact"
+                   styleClass="user-name"/>
+
+            <Label fx:id="lastSeen"
+                   text=""
+                   styleClass="user-status"/>
+        </VBox>
+    </HBox>
+
+    <!-- 🔑 BARRE DE RECHERCHE -->
+    <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" styleClass="search-box">
+        <FontIcon iconLiteral="fas-search" iconSize="14" iconColor="#888"/>
+        <TextField fx:id="searchField"
+                   promptText="Rechercher dans la conversation..."
+                   styleClass="search-field"
+                   HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <!-- ===== ZONE DROITE (Actions) ===== -->
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Button fx:id="callBtn" onAction="#handleCall" styleClass="topbar-action-btn">
+            <graphic>
+                <FontIcon iconLiteral="fas-phone" iconSize="18" iconColor="#555"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Appeler"/>
+            </tooltip>
+        </Button>
+
+        <MenuButton styleClass="topbar-menu-btn">
+            <graphic>
+                <FontIcon iconLiteral="fas-ellipsis-v" iconSize="18" iconColor="#555"/>
+            </graphic>
+            <items>
+                <MenuItem text="Infos du contact"/>
+                <MenuItem text="Sélectionner des messages"/>
+                <MenuItem text="Fermer la conversation"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="Bloquer"/>
+            </items>
+        </MenuButton>
+    </HBox>
+</HBox>
