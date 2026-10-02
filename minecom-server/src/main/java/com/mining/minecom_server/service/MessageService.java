@@ -17,10 +17,15 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final StorageService storageService;
+    private final TeamService teamService;
 
-    public MessageService(MessageRepository messageRepository, UserRepository userRepository) {
+    public MessageService(MessageRepository messageRepository, UserRepository userRepository,
+                          StorageService storageService, TeamService teamService) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
+        this.storageService = storageService;
+        this.teamService = teamService;
     }
 
     /**
@@ -36,17 +41,38 @@ public class MessageService {
         UserEntity sender = userRepository.findByUsername(senderUsername)
                 .orElseThrow(() -> new UsernameNotFoundException("Expéditeur non trouvé : " + senderUsername));
 
-        UserEntity receiver = userRepository.findById(request.getReceiverId())
-                .orElseThrow(() -> new UsernameNotFoundException("Destinataire non trouvé avec ID : " + request.getReceiverId()));
-
         // 2. Créer l'entité MessageEntity
         MessageEntity message = new MessageEntity();
         message.setSender(sender);
-        message.setReceiver(receiver);
-        message.setContent(request.getContent());
+
+        if (request.getTeamId() != null) {
+            // Message d'équipe : seul un membre peut écrire dans l'équipe
+            message.setTeam(teamService.requireMembership(request.getTeamId(), sender.getId()));
+        } else {
+            if (request.getReceiverId() == null) {
+                throw new IllegalArgumentException("Destinataire manquant (receiverId ou teamId)");
+            }
+            UserEntity receiver = userRepository.findById(request.getReceiverId())
+                    .orElseThrow(() -> new UsernameNotFoundException("Destinataire non trouvé avec ID : " + request.getReceiverId()));
+            message.setReceiver(receiver);
+        }
+        message.setContent(request.getContent() != null ? request.getContent() : "");
         message.setMessageType(request.getMessageType());
         message.setTimestamp(Instant.now());
-        // Le statut par défaut est SENT
+
+        if (request.getReplyToId() != null) {
+            message.setReplyToId(request.getReplyToId());
+            message.setReplyToContent(request.getReplyToContent());
+            message.setReplyToSenderId(request.getReplyToSenderId());
+        }
+
+        // Pièce jointe : on persiste la clé MinIO, pas l'URL présignée (qui expire)
+        if (request.getFileUrl() != null && !request.getFileUrl().isBlank()) {
+            message.setFileUrl(storageService.toObjectName(request.getFileUrl()));
+            message.setFileName(request.getFileName());
+            message.setFileType(request.getFileType());
+            message.setFileSize(request.getFileSize());
+        }
 
         // 3. Sauvegarder
         return messageRepository.save(message);

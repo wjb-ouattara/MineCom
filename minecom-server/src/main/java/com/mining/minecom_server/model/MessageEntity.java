@@ -26,9 +26,14 @@ public class MessageEntity {
     @JoinColumn(name = "sender_id", nullable = false)
     private UserEntity sender;
 
+    // Null pour un message d'équipe (le destinataire est alors 'team')
     @ManyToOne
-    @JoinColumn(name = "receiver_id", nullable = false)
+    @JoinColumn(name = "receiver_id")
     private UserEntity receiver;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private TeamEntity team;
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
@@ -44,6 +49,33 @@ public class MessageEntity {
     @Column(name = "status", length = 20)
     private MessageStatus status = MessageStatus.SENT;
 
+    @Column(name = "reply_to_id")
+    private Long replyToId;
+
+    @Column(name = "reply_to_content", columnDefinition = "TEXT")
+    private String replyToContent;
+
+    @Column(name = "reply_to_sender_id")
+    private Long replyToSenderId;
+
+    @Column(name = "is_edited")
+    private Boolean isEdited = false;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+
+    @Column(name = "file_url")
+    private String fileUrl;
+
+    @Column(name = "file_name")
+    private String fileName;
+
+    @Column(name = "file_type")
+    private String fileType;
+
+    @Column(name = "file_size")
+    private Long fileSize;
+
     // Constructeurs
     public MessageEntity() {}
 
@@ -54,5 +86,26 @@ public class MessageEntity {
         this.content = content;
         this.messageType = messageType;
     }
+
+    // Getters/Setters
+    public Long getReplyToId() { return replyToId; }
+    public void setReplyToId(Long replyToId) { this.replyToId = replyToId; }
+    public String getReplyToContent() { return replyToContent; }
+    public void setReplyToContent(String c) { this.replyToContent = c; }
+    public Long getReplyToSenderId() { return replyToSenderId; }
+    public void setReplyToSenderId(Long id) { this.replyToSenderId = id; }
+    public Boolean getIsEdited() { return isEdited; }
+    public void setIsEdited(Boolean isEdited) { this.isEdited = isEdited; }
+    public Boolean getIsDeleted() { return isDeleted; }
+    public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
+
+    public String getFileUrl() { return fileUrl; }
+    public void setFileUrl(String u) { this.fileUrl = u; }
+    public String getFileName() { return fileName; }
+    public void setFileName(String n) { this.fileName = n; }
+    public String getFileType() { return fileType; }
+    public void setFileType(String t) { this.fileType = t; }
+    public Long getFileSize() { return fileSize; }
+    public void setFileSize(Long s) { this.fileSize = s; }
 
 }

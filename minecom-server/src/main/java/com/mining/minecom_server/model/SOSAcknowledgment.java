@@ -11,19 +11,23 @@ public class SOSAcknowledgment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "alert_id", nullable = false)
     private SOSAlert alert;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    // 🔑 CORRECTION : Utiliser UserEntity au lieu de User
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_sos_ack_user"))
     private UserEntity user;
 
-    @Column(name = "timestamp", nullable = false)
+    @Column(nullable = false)
     private Instant timestamp;
 
-    // Constructeurs
-    public SOSAcknowledgment() {}
+    public SOSAcknowledgment() {
+        this.timestamp = Instant.now();
+    }
 
     // Getters et Setters
     public Long getId() { return id; }

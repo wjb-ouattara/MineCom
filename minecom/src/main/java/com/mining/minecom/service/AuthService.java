@@ -2,6 +2,7 @@ package com.mining.minecom.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mining.minecom.common.dto.JwtResponse;
+import com.mining.minecom.common.dto.UserDto;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -50,12 +51,55 @@ public class AuthService {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            // 2. Désérialisation et stockage du token
+
             JwtResponse jwtResponse = mapper.readValue(response.body(), JwtResponse.class);
+
             currentJwtToken = jwtResponse.getToken();
+
             System.out.println("DEBUG CLIENT: Connexion réussie. Token stocké.");
+
+
+            // Récupération des infos utilisateur
+            HttpRequest userRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_API_URL + "users/by-username/" + username))
+                    .header("Authorization", "Bearer " + currentJwtToken)
+                    .GET()
+                    .build();
+
+
+            HttpResponse<String> userResponse =
+                    client.send(userRequest, HttpResponse.BodyHandlers.ofString());
+
+
+            if(userResponse.statusCode() == 200){
+
+                UserDto user = mapper.readValue(userResponse.body(), UserDto.class);
+
+
+                currentUsername = user.getUsername();
+                currentUserId = user.getId();
+
+
+                System.out.println(
+                        "✅ User chargé : "
+                                + currentUsername
+                                + " ID="
+                                + currentUserId
+                );
+
+            }else{
+
+                System.err.println(
+                        "Impossible de récupérer user : "
+                                + userResponse.statusCode()
+                );
+
+            }
+
+
             return true;
-        } else {
+        }
+        else {
             // Statut 401 ou 400
             System.err.println("Échec de la connexion. Statut : " + response.statusCode());
             // Vous pouvez lancer une exception ou retourner false

@@ -57,18 +57,49 @@
                 <VBox>
                     <fx:include fx:id="topbar" source="layouts/topbar.fxml"/>
 
-                    <ScrollPane fitToWidth="true"
+                    <ScrollPane fx:id="chatScrollPane"
+                                fitToWidth="true"
                                 hbarPolicy="NEVER"
                                 vbarPolicy="AS_NEEDED"
                                 styleClass="chat-scroll"
                                 VBox.vgrow="ALWAYS">
-                        <VBox fx:id="chatContainer"
-                              spacing="10">
+                        <VBox fx:id="chatContainer" spacing="10">
                             <padding>
                                 <Insets top="15" right="40" bottom="15" left="40"/>
                             </padding>
                         </VBox>
                     </ScrollPane>
+
+                    <!-- 🔑 Ajoutez ce bloc JUSTE AVANT le HBox de la zone de saisie (message-box) -->
+                    <HBox fx:id="replyPreviewBar"
+                          visible="false"
+                          managed="false"
+                          alignment="CENTER_LEFT"
+                          spacing="10"
+                          style="-fx-background-color: #f0f0f0; -fx-padding: 8 15 8 15; -fx-border-color: #FF8C00; -fx-border-width: 0 0 0 4;">
+
+                        <!-- Icône mining unique -->
+                        <FontIcon iconLiteral="fas-hard-hat" iconSize="16" iconColor="#FF8C00"/>
+
+                        <VBox HBox.hgrow="ALWAYS" spacing="2">
+                            <Label fx:id="replyToLabel"
+                                   text="Répondre à"
+                                   style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #FF8C00;"/>
+                            <Label fx:id="replyPreviewText"
+                                   text=""
+                                   style="-fx-font-size: 12px; -fx-text-fill: #555;"
+                                   maxWidth="400"/>
+                        </VBox>
+
+                        <Button onAction="#cancelReply"
+                                style="-fx-background-color: transparent; -fx-cursor: hand;">
+                            <graphic>
+                                <FontIcon iconLiteral="fas-times" iconSize="14" iconColor="#888"/>
+                            </graphic>
+                        </Button>
+                    </HBox>
+
+                    <!-- La zone de saisie existante suit ici (message-box) -->
 
                     <HBox spacing="10" styleClass="message-box" alignment="CENTER">
                         <padding>
@@ -87,6 +118,23 @@
                                   promptText="Taper votre message..."
                                   HBox.hgrow="ALWAYS"
                                   styleClass="messageField"/>
+
+                        <!-- Ajoutez ces 2 boutons AVANT le bouton d'envoi (paper-plane) -->
+                        <Button fx:id="imageBtn" onAction="#handleSendImage"
+                                style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 8;">
+                            <graphic>
+                                <FontIcon iconLiteral="fas-image" iconSize="20" iconColor="#FF8C00"/>
+                            </graphic>
+                            <tooltip><Tooltip text="Envoyer une image"/></tooltip>
+                        </Button>
+
+                        <Button fx:id="pdfBtn" onAction="#handleSendPdf"
+                                style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 8;">
+                            <graphic>
+                                <FontIcon iconLiteral="fas-file-pdf" iconSize="20" iconColor="#DC2626"/>
+                            </graphic>
+                            <tooltip><Tooltip text="Envoyer un PDF"/></tooltip>
+                        </Button>
 
                         <Button onAction="#handleSendMessage" styleClass="sendButton">
                             <graphic>

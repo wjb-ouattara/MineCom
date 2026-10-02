@@ -27,6 +27,17 @@ public class MessageService {
      * Récupère l'historique de conversation avec un utilisateur
      */
     public List<MessageResponse> getConversationHistory(Long partnerId) {
+        return fetchHistory(BASE_API_URL + "/" + partnerId);
+    }
+
+    /**
+     * Récupère l'historique d'une équipe (vide si l'utilisateur n'en est pas membre)
+     */
+    public List<MessageResponse> getTeamHistory(Long teamId) {
+        return fetchHistory(BASE_API_URL + "/team/" + teamId);
+    }
+
+    private List<MessageResponse> fetchHistory(String url) {
         String jwtToken = AuthService.getCurrentJwtToken();
 
         if (jwtToken == null) {
@@ -36,7 +47,7 @@ public class MessageService {
 
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BASE_API_URL + "/" + partnerId))
+                    .uri(new URI(url))
                     .header("Authorization", "Bearer " + jwtToken)
                     .GET()
                     .build();

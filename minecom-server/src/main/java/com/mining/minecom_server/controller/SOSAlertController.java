@@ -90,10 +90,20 @@ public class SOSAlertController {
      * 📋 RÉCUPÉRER L'ALERTE ACTIVE
      */
     @GetMapping("/active")
-    public ResponseEntity<SOSAlertDto> getActiveAlert() {
+    public ResponseEntity<SOSAlertDto> getActiveAlert(Authentication authentication) {
         SOSAlertDto alert = sosAlertService.getActiveAlert();
 
         if (alert != null) {
+            // 🔑 NOUVEAU : Vérifier si l'utilisateur connecté a déjà accusé réception
+            if (authentication != null) {
+                String username = authentication.getName();
+                UserEntity user = userRepository.findByUsername(username).orElse(null);
+                if (user != null) {
+                    boolean hasAcknowledged = sosAlertService.hasUserAcknowledged(alert.getId(), user.getId());
+                    alert.setHasAcknowledged(hasAcknowledged);
+                    System.out.println("🔍 Alerte active pour " + username + " - déjà accusé: " + hasAcknowledged);
+                }
+            }
             return ResponseEntity.ok(alert);
         }
         return ResponseEntity.noContent().build();

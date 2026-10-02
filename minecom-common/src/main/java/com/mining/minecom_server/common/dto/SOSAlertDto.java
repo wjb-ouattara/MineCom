@@ -11,6 +11,7 @@ public class SOSAlertDto {
     private Instant timestamp;
     private Integer acknowledgedCount;
     private Integer totalOnlineUsers;
+    private Boolean hasAcknowledged = false;
 
     // Constructeurs
     public SOSAlertDto() {}
@@ -55,4 +56,7 @@ public class SOSAlertDto {
     public void setTotalOnlineUsers(Integer totalOnlineUsers) {
         this.totalOnlineUsers = totalOnlineUsers;
     }
+
+    public Boolean getHasAcknowledged() { return hasAcknowledged; }
+    public void setHasAcknowledged(Boolean hasAcknowledged) { this.hasAcknowledged = hasAcknowledged; }
 }

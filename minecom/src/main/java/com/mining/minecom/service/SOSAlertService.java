@@ -29,19 +29,32 @@ public class SOSAlertService {
         }
 
         try {
-            String url = BASE_API_URL + "/alert?location=" +
-                    (location != null ? location : "") +
-                    "&description=" + (description != null ? description : "");
+            // 🔑 CORRECTION : Envoyer un body JSON au lieu de query params
+            String url = BASE_API_URL + "/alert";
+
+            // Construire le body JSON
+            String jsonBody = String.format(
+                    "{\"location\": \"%s\", \"description\": \"%s\"}",
+                    location != null ? location.replace("\"", "\\\"") : "",
+                    description != null ? description.replace("\"", "\\\"") : ""
+            );
+
+            System.out.println("🔗 URL SOS : " + url);
+            System.out.println("📦 Body JSON : " + jsonBody);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(url))
                     .header("Authorization", "Bearer " + jwtToken)
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.noBody())
+                    // 🔑 CORRECTION : Envoyer le JSON dans le body
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
 
             HttpResponse<String> response = httpClient.send(request,
                     HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("📥 Status : " + response.statusCode());
+            System.out.println("📥 Réponse : " + response.body());
 
             if (response.statusCode() == 200) {
                 SOSAlertDto alert = mapper.readValue(response.body(), SOSAlertDto.class);
@@ -49,6 +62,7 @@ public class SOSAlertService {
                 return alert;
             } else {
                 System.err.println("Erreur SOS: Code: " + response.statusCode());
+                System.err.println("Réponse: " + response.body());
                 return null;
             }
 

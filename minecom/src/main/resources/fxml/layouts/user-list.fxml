@@ -20,11 +20,20 @@
                        promptText="Rechercher des users ou messages ..."
                        HBox.hgrow="ALWAYS"/>
         </HBox>
-        <HBox alignment="TOP_CENTER" spacing="5">
-            <Button text="Toutes"/>
-            <Button text="Favoris"/>
-            <Button text="Non lues"/>
-            <Button text="Equipes"/>
+        <HBox alignment="CENTER_LEFT" spacing="5">
+            <Button fx:id="filterAllBtn" text="Toutes" onAction="#showAll" styleClass="filter-btn"/>
+            <Button text="Favoris" styleClass="filter-btn"/>
+            <Button fx:id="filterUnreadBtn" text="Non lues" onAction="#showUnread" styleClass="filter-btn"/>
+            <Button fx:id="filterTeamsBtn" text="Equipes" onAction="#showTeams" styleClass="filter-btn"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button onAction="#handleNewTeam" styleClass="new-team-btn">
+                <graphic>
+                    <FontIcon iconLiteral="fas-users" iconSize="14" iconColor="#FF8C00"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Nouvelle équipe"/>
+                </tooltip>
+            </Button>
         </HBox>
     </VBox>
 

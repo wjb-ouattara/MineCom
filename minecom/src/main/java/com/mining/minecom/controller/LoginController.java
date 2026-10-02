@@ -203,6 +203,11 @@ public class LoginController implements Initializable {
             currentStage.setTitle("MineCom Dashboard");
             currentStage.show();
 
+            // Badge sur l'icône de la barre des tâches + fonctionnement en arrière-plan
+            if (dashboardController != null) {
+                dashboardController.attachStage(currentStage);
+            }
+
             if (cssUrl != null) {
                 dashboardScene.getStylesheets().add(cssUrl.toExternalForm());
                 System.out.println("DEBUG UI: CSS 'theme-mining.css' chargé pour le Dashboard.");

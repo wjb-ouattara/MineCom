@@ -13,10 +13,21 @@ public class MessageResponse {
     private Long messageId;
     private Long senderId;
     private Long receiverId;
+    private Long teamId;          // non null pour un message d'équipe
+    private String senderUsername;
     private String content;
     private Instant timestamp;
     private MessageType messageType;
     private MessageStatus status;
+    private Long replyToId;
+    private String replyToContent;
+    private Long replyToSenderId;
+    private Boolean isEdited;
+    private Boolean isDeleted;
+    private String fileUrl;
+    private String fileName;
+    private String fileType;
+    private Long fileSize;
 
     public MessageResponse() {}
 
@@ -54,4 +65,40 @@ public class MessageResponse {
     public void setMessageType(MessageType messageType) { this.messageType = messageType; }
     public MessageStatus getStatus() { return status; }
     public void setStatus(MessageStatus status) { this.status = status; }
+    public String getReplyToContent() { return replyToContent; }
+    public void setReplyToContent(String replyToContent) { this.replyToContent = replyToContent; }
+
+    public Long getReplyToSenderId() { return replyToSenderId; }
+    public void setReplyToSenderId(Long replyToSenderId) { this.replyToSenderId = replyToSenderId; }
+
+    public Long getReplyToId() { return replyToId; }
+    public void setReplyToId(Long replyToId) { this.replyToId = replyToId; }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+    public void setIsDeleted(Boolean isDeleted){
+        this.isDeleted = isDeleted;
+    }
+
+    public Boolean getIsEdited() {
+        return isEdited;
+    }
+    public void setIsEdited(Boolean isEdited){
+        this.isEdited = isEdited;
+    }
+
+    public Long getTeamId() { return teamId; }
+    public void setTeamId(Long teamId) { this.teamId = teamId; }
+    public String getSenderUsername() { return senderUsername; }
+    public void setSenderUsername(String senderUsername) { this.senderUsername = senderUsername; }
+
+    public String getFileUrl() { return fileUrl; }
+    public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
+    public String getFileName() { return fileName; }
+    public void setFileName(String fileName) { this.fileName = fileName; }
+    public String getFileType() { return fileType; }
+    public void setFileType(String fileType) { this.fileType = fileType; }
+    public Long getFileSize() { return fileSize; }
+    public void setFileSize(Long fileSize) { this.fileSize = fileSize; }
 }

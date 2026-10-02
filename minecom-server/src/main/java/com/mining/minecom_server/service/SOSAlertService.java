@@ -138,4 +138,21 @@ public class SOSAlertService {
                 alert.getTimestamp()
         );
     }
+
+    // Ajoutez cette méthode dans SOSAlertService.java (serveur)
+
+    public boolean hasUserAcknowledged(Long alertId, Long userId) {
+        try {
+            SOSAlert alert = sosAlertRepository.findById(alertId).orElse(null);
+            if (alert == null) return false;
+
+            UserEntity user = userRepository.findById(userId).orElse(null);
+            if (user == null) return false;
+
+            return acknowledgmentRepository.findByAlertAndUser(alert, user).isPresent();
+        } catch (Exception e) {
+            System.err.println("Erreur hasUserAcknowledged: " + e.getMessage());
+            return false;
+        }
+    }
 }

@@ -1,6 +1,8 @@
 package com.mining.minecom.service;
 
 import com.mining.minecom.common.dto.*;
+import com.mining.minecom_server.common.dto.MessageReadNotification;
+import com.mining.minecom_server.common.dto.TeamDto;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -9,6 +11,8 @@ import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.WebSocketHttpHeaders;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.lang.reflect.Type;
 import javafx.application.Platform;
@@ -16,7 +20,7 @@ import javafx.application.Platform;
 public class WebSocketService {
 
     private StompSession stompSession;
-    // 🔑 Assurez-vous que cette URL est correcte (votre serveur doit être sur localhost:8080)
+    //  Assurez-vous que cette URL est correcte (votre serveur doit être sur localhost:8080)
     private final String WS_URL = "ws://localhost:8080/ws";
     private final AuthService authService;
     private DashboardCallback callback;
@@ -27,6 +31,12 @@ public class WebSocketService {
         void onConnectedSuccess();
         void onSOSAlertReceived(SOSAlertDto alert);
         void onSOSAcknowledgment(SOSAcknowledgmentDto ack);
+        void onMessagesRead(MessageReadNotification notif);
+        void onMessageEdited(MessageResponse msg);
+        void onMessageDeleted(MessageResponse msg);
+        void onTeamMessageReceived(MessageResponse message);
+        void onTeamUpdated(TeamDto team);
+        void onTeamRemoved(TeamDto team);
     }
 
     // --- CONSTRUCTEUR ---
@@ -40,13 +50,20 @@ public class WebSocketService {
 
     // --- MÉTHODE CONNECT ---
     public void connect() {
-        System.out.println("🔄 DÉBUT de la tentative de connexion WebSocket...");
+        System.out.println(" DÉBUT de la tentative de connexion WebSocket...");
         System.out.println("   URL cible: " + WS_URL);
         System.out.println("   Token JWT: " + (authService.getCurrentJwtToken() != null ? "PRÉSENT" : "ABSENT"));
 
         WebSocketClient client = new StandardWebSocketClient();
         WebSocketStompClient stompClient = new WebSocketStompClient(client);
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        // Configurer Jackson avec JavaTimeModule
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        converter.setObjectMapper(objectMapper);
+        stompClient.setMessageConverter(converter);
 
         StompSessionHandlerAdapter sessionHandler = new SessionHandler();
 
@@ -59,7 +76,7 @@ public class WebSocketService {
 
         WebSocketHttpHeaders handshakeHeaders = new WebSocketHttpHeaders();
 
-        System.out.println("🚀 Appel de connectAsync()...");
+        System.out.println(" Appel de connectAsync()...");
 
         try {
             stompClient.connectAsync(
@@ -86,11 +103,13 @@ public class WebSocketService {
     }
     // --- MÉTHODE SEND MESSAGE ---
     public void sendMessage(MessageRequest messageRequestDto) {
-        // 🔑 Utilisation de la méthode isConnected() corrigée
+        //  Utilisation de la méthode isConnected() corrigée
         if (isConnected()) {
-            // 🔑 CORRECTION : Chemin spécifique pour l'envoi de messages privés
-            stompSession.send("/app/private-message", messageRequestDto);
-            // 💡 IMPORTANT : Vérifiez que votre serveur écoute bien le @MessageMapping("/private-message")
+            //  CORRECTION : Chemin spécifique pour l'envoi de messages privés
+            // Message d'équipe → /app/team-message, sinon message privé
+            String destination = messageRequestDto.getTeamId() != null ? "/app/team-message" : "/app/private-message";
+            stompSession.send(destination, messageRequestDto);
+            //  IMPORTANT : Vérifiez que votre serveur écoute bien le @MessageMapping("/private-message")
         } else {
             System.err.println("Impossible d'envoyer le message : la session WebSocket n'est pas connectée.");
         }
@@ -101,7 +120,7 @@ public class WebSocketService {
      * @return true si la session STOMP est non nulle et connectée.
      */
     public boolean isConnected(){
-        // 🔑 CORRECTION : Vérifie l'existence de l'objet ET son état de connexion
+        //  CORRECTION : Vérifie l'existence de l'objet ET son état de connexion
         return this.stompSession != null && this.stompSession.isConnected();
     }
 
@@ -110,13 +129,18 @@ public class WebSocketService {
 
         @Override
         public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-            stompSession = session; // 🔑 Stockage critique de la session
+            stompSession = session; //  Stockage critique de la session
             System.out.println("WebSocket: Connecté à la session STOMP. Session ID: " + session.getSessionId());
 
             subscribeToPrivateMessages();
             subscribeToPresence();
             subscribeToSOSAlerts();
             subscribeToSOSAcknowledgments();
+            //  Abonnement aux notifications de lecture
+            subscribeToReadReceipts();
+            subscribeToMessageEdited();
+            subscribeToMessageDeleted();
+            subscribeToTeams();
             if (callback != null) {
                 Platform.runLater(() -> callback.onConnectedSuccess());
             }
@@ -132,7 +156,10 @@ public class WebSocketService {
 
         @Override
         public void handleException(StompSession session, org.springframework.messaging.simp.stomp.StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
-            System.err.println("WebSocket: Erreur lors de la gestion de la trame STOMP. " + exception.getMessage());
+            // Ex: échec de désérialisation JSON → handleFrame() de l'abonnement n'est jamais appelé
+            System.err.println("WebSocket: Erreur lors de la gestion de la trame STOMP ("
+                    + headers.getDestination() + "). " + exception.getMessage());
+            exception.printStackTrace();
         }
 
         // Gère les messages non attendus par les abonnements
@@ -161,6 +188,25 @@ public class WebSocketService {
             }
         });
         System.out.println("WebSocket: Abonné aux mises à jour de présence: " + destination);
+    }
+
+    private void subscribeToReadReceipts() {
+        String destination = "/user/queue/message-read";
+        stompSession.subscribe(destination, new StompSessionHandlerAdapter() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return MessageReadNotification.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                MessageReadNotification notif = (MessageReadNotification) payload;
+                if (callback != null) {
+                    Platform.runLater(() -> callback.onMessagesRead(notif));
+                }
+            }
+        });
+        System.out.println("WebSocket: Abonné aux lectures: " + destination);
     }
 
     // S'abonner aux alertes SOS
@@ -222,6 +268,77 @@ public class WebSocketService {
             }
         });
         System.out.println("WebSocket: Abonné à la file d'attente privée: " + destination);
+    }
+    private void subscribeToMessageEdited() {
+        stompSession.subscribe("/user/queue/message-edited", new StompSessionHandlerAdapter() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) { return MessageResponse.class; }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                MessageResponse msg = (MessageResponse) payload;
+                if (callback != null) {
+                    Platform.runLater(() -> callback.onMessageEdited(msg));
+                }
+            }
+        });
+    }
+
+    private void subscribeToMessageDeleted() {
+        stompSession.subscribe("/user/queue/message-deleted", new StompSessionHandlerAdapter() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) { return MessageResponse.class; }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                MessageResponse msg = (MessageResponse) payload;
+                if (callback != null) {
+                    Platform.runLater(() -> callback.onMessageDeleted(msg));
+                }
+            }
+        });
+    }
+
+    // Équipes : messages, mises à jour (création, membres) et retrait.
+    // Files privées (/user/queue/...) : le serveur n'y envoie que ce qui concerne cet utilisateur.
+    private void subscribeToTeams() {
+        stompSession.subscribe("/user/queue/team-messages", new StompSessionHandlerAdapter() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) { return MessageResponse.class; }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                MessageResponse msg = (MessageResponse) payload;
+                if (callback != null) {
+                    Platform.runLater(() -> callback.onTeamMessageReceived(msg));
+                }
+            }
+        });
+        stompSession.subscribe("/user/queue/team-updated", new StompSessionHandlerAdapter() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) { return TeamDto.class; }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                TeamDto team = (TeamDto) payload;
+                if (callback != null) {
+                    Platform.runLater(() -> callback.onTeamUpdated(team));
+                }
+            }
+        });
+        stompSession.subscribe("/user/queue/team-removed", new StompSessionHandlerAdapter() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) { return TeamDto.class; }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                TeamDto team = (TeamDto) payload;
+                if (callback != null) {
+                    Platform.runLater(() -> callback.onTeamRemoved(team));
+                }
+            }
+        });
+        System.out.println("WebSocket: Abonné aux équipes");
     }
 
     // --- MÉTHODE DISCONNECT ---

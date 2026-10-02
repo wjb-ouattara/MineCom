@@ -66,7 +66,7 @@
                 <FontIcon iconLiteral="fas-ellipsis-v" iconSize="18" iconColor="#555"/>
             </graphic>
             <items>
-                <MenuItem text="Infos du contact"/>
+                <MenuItem fx:id="infoMenuItem" text="Infos du contact" onAction="#handleInfo"/>
                 <MenuItem text="Sélectionner des messages"/>
                 <MenuItem text="Fermer la conversation"/>
                 <SeparatorMenuItem/>

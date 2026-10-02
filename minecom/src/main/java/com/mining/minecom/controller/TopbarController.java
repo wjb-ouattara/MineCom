@@ -2,6 +2,10 @@ package com.mining.minecom.controller;
 
 import javafx.fxml.FXML;
 import com.mining.minecom.common.dto.UserDto;
+import com.mining.minecom_server.common.dto.TeamDto;
+import com.mining.minecom_server.common.dto.TeamMemberDto;
+import javafx.scene.control.MenuItem;
+import org.kordamp.ikonli.javafx.FontIcon;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -25,10 +29,12 @@ public class TopbarController implements Initializable {
     @FXML private Label userName;
     @FXML private Label lastSeen;
     @FXML private TextField searchField;
+    @FXML private MenuItem infoMenuItem;
 
     private double xOffset = 0;
     private double yOffset = 0;
     private Consumer<String> searchCallback;
+    private Runnable infoCallback;
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -52,6 +58,16 @@ public class TopbarController implements Initializable {
     public void setSearchCallback(Consumer<String> callback) {
         this.searchCallback = callback;
     }
+    /** Action du menu « Infos du contact / de l'équipe ». */
+    public void setInfoCallback(Runnable callback) {
+        this.infoCallback = callback;
+    }
+
+    @FXML
+    private void handleInfo() {
+        if (infoCallback != null) infoCallback.run();
+    }
+
     public void clearSearch() {
         searchField.clear();
     }
@@ -82,6 +98,32 @@ public class TopbarController implements Initializable {
             userName.setText(user.getUsername());
             lastSeen.setText(user.getIsOnline() ? "En ligne" : "Hors ligne");
             updateAvatar(user.getUsername());
+            if (infoMenuItem != null) infoMenuItem.setText("Infos du contact");
+        }
+    }
+
+    /** Afficher l'équipe sélectionnée : nom + liste des membres. */
+    public void updateTeam(TeamDto team) {
+        if (team == null) return;
+        userName.setText(team.getName());
+        String members = team.getMembers().stream()
+                .map(TeamMemberDto::getUsername)
+                .limit(5)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("");
+        int total = team.getMembers().size();
+        lastSeen.setText(total + " membres" + (members.isEmpty() ? "" : " : " + members + (total > 5 ? "…" : "")));
+        if (infoMenuItem != null) infoMenuItem.setText("Infos de l'équipe");
+
+        if (avatarContainer != null) {
+            avatarContainer.getChildren().clear();
+            Circle background = new Circle(20);
+            background.setFill(getColorForUser(team.getName()));
+            FontIcon groupIcon = new FontIcon("fas-users");
+            groupIcon.setIconSize(16);
+            groupIcon.setIconColor(Color.WHITE);
+            avatarContainer.getChildren().addAll(background, groupIcon);
+            avatarContainer.setAlignment(Pos.CENTER);
         }
     }
 

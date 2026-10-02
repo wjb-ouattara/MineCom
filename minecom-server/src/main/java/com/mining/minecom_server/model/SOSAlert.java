@@ -2,6 +2,8 @@ package com.mining.minecom_server.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "sos_alerts")
@@ -11,24 +13,31 @@ public class SOSAlert {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "sender_id", nullable = false)
+    // 🔑 CORRECTION : Référencer la bonne table app_user
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "sender_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_sos_alert_sender"))
     private UserEntity sender;
 
-    @Column(name = "location", length = 255)
+    @Column(nullable = false)
     private String location;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "timestamp", nullable = false)
+    @Column(nullable = false)
     private Instant timestamp;
 
-    @Column(name = "is_active")
+    @Column(nullable = false)
     private Boolean isActive = true;
 
-    // Constructeurs
-    public SOSAlert() {}
+    @OneToMany(mappedBy = "alert", cascade = CascadeType.ALL)
+    private Set<SOSAcknowledgment> acknowledgments = new HashSet<>();
+
+    public SOSAlert() {
+        this.timestamp = Instant.now();
+    }
 
     // Getters et Setters
     public Long getId() { return id; }
@@ -47,5 +56,10 @@ public class SOSAlert {
     public void setTimestamp(Instant timestamp) { this.timestamp = timestamp; }
 
     public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+    public void setIsActive(Boolean active) { isActive = active; }
+
+    public Set<SOSAcknowledgment> getAcknowledgments() { return acknowledgments; }
+    public void setAcknowledgments(Set<SOSAcknowledgment> acknowledgments) {
+        this.acknowledgments = acknowledgments;
+    }
 }

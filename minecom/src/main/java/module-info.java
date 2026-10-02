@@ -34,14 +34,9 @@ module com.mining.minecom {
     requires spring.messaging;
     requires spring.core;
 
-    // ========================================
-    // 🔑 DÉPENDANCE AU MODULE COMMON (CRITIQUE!)
-    // ========================================
     requires com.mining.minecom.common;
+    requires java.desktop;
 
-    // ========================================
-    // OPENS (pour la réflexion)
-    // ========================================
     opens com.mining.minecom to javafx.fxml;
     opens com.mining.minecom.service to spring.core;
     opens com.mining.minecom.controller to javafx.fxml;

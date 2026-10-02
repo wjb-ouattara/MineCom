@@ -70,10 +70,17 @@ public class SOSAlertPopupController {
                 Platform.runLater(() -> {
                     System.out.println("✅ Accusé de réception envoyé pour alerte ID=" +
                             currentAlert.getId());
+                    if (onAcknowledgeCallback != null) {
+                        onAcknowledgeCallback.accept(currentAlert.getId());
+                    }
                     handleClose();
                 });
             }).start();
         }
+    }
+    private java.util.function.Consumer<Long> onAcknowledgeCallback;
+    public void setOnAcknowledgeCallback(java.util.function.Consumer<Long> callback) {
+        this.onAcknowledgeCallback = callback;
     }
 
     @FXML

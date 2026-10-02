@@ -13,3 +13,7 @@ Thumbs.db
 
 # JavaFX
 *.jpackage
+
+# Secrets locaux
+.env
+!.env.example

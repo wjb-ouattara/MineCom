@@ -31,10 +31,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
      */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // 1. Préfixes de destination pour le client (où les messages sont ROUTÉS)
-        // Les abonnements aux files d'attente se feront vers /user/queue
-        // Les messages globaux se feront vers /topic
-        config.enableSimpleBroker("/topic", "/user");
+        // 1. Préfixes de destination gérés par le broker en mémoire.
+        // /topic : diffusion à tous.
+        // /queue : files privées. convertAndSendToUser(user, "/queue/x") est résolu
+        //          par UserDestinationMessageHandler en "/queue/x-user{sessionId}" :
+        //          sans "/queue" ici, le broker ignore ces messages (et les SUBSCRIBE
+        //          à /user/queue/...) en silence.
+        config.enableSimpleBroker("/topic", "/queue");
 
         // 2. Préfixe pour les messages point-à-point (système de file d'attente utilisateur)
         // Il est utilisé pour les messages privés. Spring préfixera automatiquement 
