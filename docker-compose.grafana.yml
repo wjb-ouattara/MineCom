@@ -9,8 +9,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD}
     volumes:
       - grafana-data:/var/lib/grafana
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    # PostgreSQL tourne sur Windows (port 5433) : Docker Desktop résout
+    # nativement host.docker.internal vers l'hôte, pas besoin d'extra_hosts.
 
 volumes:
   grafana-data:
