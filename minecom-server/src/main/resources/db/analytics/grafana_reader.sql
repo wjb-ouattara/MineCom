@@ -3,7 +3,7 @@
 -- À exécuter par le propriétaire des tables (DB_USERNAME), base "minecom".
 -- Rejouable sans erreur.
 --
--- Le mot de passe n'est pas versionné : il vient de GRAFANA_DB_PASSWORD (.env)
+-- Le mot de passe n'est pas versionné : il vient de GRAFANA_DB_PASSWORD (.env.grafana)
 -- et se passe à psql avec -v grafana_password="$GRAFANA_DB_PASSWORD".
 -- =====================================================================
 

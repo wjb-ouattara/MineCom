@@ -98,7 +98,7 @@ Indicateurs clés par jour.
 ## 6. Utilisateur Grafana
 
 - `grafana_reader`, créé seulement s'il n'existe pas (bloc `DO`).
-- Mot de passe **non versionné** : variable `GRAFANA_DB_PASSWORD` dans `.env` (voir `.env.example`), passée à psql avec `-v grafana_password=…`. Il ne sert qu'à la création du rôle, donc le changer après coup demande `ALTER USER grafana_reader WITH PASSWORD '…';`.
+- Mot de passe **non versionné** : variable `GRAFANA_DB_PASSWORD` dans `.env.grafana` (voir `.env.grafana.example`), passée à psql avec `-v grafana_password=…`. Il ne sert qu'à la création du rôle, donc le changer après coup demande `ALTER USER grafana_reader WITH PASSWORD '…';`.
 - Droits : `CONNECT` sur `minecom`, `USAGE` sur `public`, `SELECT` sur toutes les tables et vues.
 - `ALTER DEFAULT PRIVILEGES` : il pourra aussi lire les futures tables et vues créées par le propriétaire (`minecom_user`, le compte utilisé par Hibernate).
 - `REVOKE SELECT ON app_user, app_users` : pas d'accès direct aux hachages de mots de passe. Les vues (qui affichent `username`) restent lisibles, car elles s'exécutent avec les droits de leur propriétaire.
@@ -107,7 +107,7 @@ Indicateurs clés par jour.
 ## 7. Exécution et tests (2026-10-03)
 
 ```bash
-set -a; . ./.env; set +a
+set -a; . ./.env; . ./.env.grafana; set +a
 PGPASSWORD="$DB_PASSWORD" psql -h localhost -p 5433 -U "$DB_USERNAME" -d minecom -v ON_ERROR_STOP=1 \
   -v grafana_password="$GRAFANA_DB_PASSWORD" \
   -f minecom-server/src/main/resources/db/analytics/analytics_views.sql \
@@ -151,14 +151,15 @@ Le dashboard et la source de données sont provisionnés depuis le dépôt (Infr
 
 | Fichier | Rôle |
 |---|---|
-| `docker-compose.grafana.yml` | Conteneur `minecom-grafana`, montages en lecture seule, variables lues depuis `.env` (`env_file`) |
+| `docker-compose.grafana.yml` | Conteneur `minecom-grafana`, montages en lecture seule, variables lues depuis `.env.grafana` (`env_file`) |
+| `.env.grafana.example` | Modèle de `.env.grafana` (non versionné) : `GF_SECURITY_ADMIN_USER`, `GF_SECURITY_ADMIN_PASSWORD`, `GRAFANA_DB_PASSWORD` |
 | `infra/grafana/provisioning/datasources/minecom-postgres.yml` | Source PostgreSQL, uid fixe `minecom-postgres` (`host.docker.internal:5433`, base `minecom`, `grafana_reader`, SSL désactivé) |
 | `infra/grafana/provisioning/dashboards/dashboards.yml` | Provider qui charge les JSON de `/var/lib/grafana/dashboards` dans le dossier `MineCom` |
 | `infra/grafana/dashboards/minecom-operations-securite.json` | Dashboard « MineCom - Opérations & Sécurité » (uid `minecom-ops`, schéma Grafana v2) |
 
 **Lancer**
 
-1. Renseigner dans `.env` : `GF_SECURITY_ADMIN_USER`, `GF_SECURITY_ADMIN_PASSWORD` et `GRAFANA_DB_PASSWORD` (voir `.env.example`).
+1. Copier `.env.grafana.example` en `.env.grafana` et renseigner `GF_SECURITY_ADMIN_USER`, `GF_SECURITY_ADMIN_PASSWORD` et `GRAFANA_DB_PASSWORD`. Seul ce fichier est transmis au conteneur : les secrets PostgreSQL et MinIO de `.env` n'y entrent pas.
 2. `docker compose -f docker-compose.grafana.yml up -d --force-recreate`
 3. Ouvrir <http://localhost:3000/d/minecom-ops> (dossier `MineCom`).
 
@@ -170,3 +171,5 @@ Le dashboard et la source de données sont provisionnés depuis le dépôt (Infr
 curl -u "$GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD" "http://localhost:3000/api/search?query=MineCom"
 curl -u "$GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD" http://localhost:3000/api/datasources/uid/minecom-postgres/health
 ```
+
+Résultat (2026-10-04) : dashboard `minecom-ops` trouvé dans le dossier `MineCom`, santé de `minecom-postgres` : `Database Connection OK`.

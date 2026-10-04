@@ -16,4 +16,6 @@ Thumbs.db
 
 # Secrets locaux
 .env
+.env.grafana
 !.env.example
+!.env.grafana.example

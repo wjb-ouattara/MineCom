@@ -5,9 +5,9 @@ services:
     ports:
       - "3000:3000"
     # GF_SECURITY_ADMIN_USER / GF_SECURITY_ADMIN_PASSWORD et GRAFANA_DB_PASSWORD
-    # (utilisé par le provisioning de la source de données) viennent de .env.
+    # (utilisé par le provisioning de la source de données) viennent de .env.grafana.
     env_file:
-      - .env
+      - .env.grafana
     volumes:
       - grafana-data:/var/lib/grafana
       - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
