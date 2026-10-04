@@ -1,0 +1,18 @@
+# Source PostgreSQL MineCom (base native Windows, port 5433), en lecture seule.
+# Le mot de passe vient de GRAFANA_DB_PASSWORD (.env, chargé par env_file).
+apiVersion: 1
+
+datasources:
+  - name: MineCom PostgreSQL
+    uid: minecom-postgres
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: host.docker.internal:5433
+    user: grafana_reader
+    isDefault: true
+    editable: false
+    jsonData:
+      database: minecom
+      sslmode: disable
+    secureJsonData:
+      password: ${GRAFANA_DB_PASSWORD}

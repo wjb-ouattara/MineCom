@@ -1,0 +1,11 @@
+# Charge les dashboards JSON versionnés dans infra/grafana/dashboards.
+apiVersion: 1
+
+providers:
+  - name: minecom
+    folder: MineCom
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards

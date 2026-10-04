@@ -142,3 +142,31 @@ Contrôles de cohérence :
 | SOS non acquittés conservés | SOS 1 et 2 → `EN ATTENTE` ✅ |
 | `grafana_reader` : `CREATE TABLE` | refusé (`droit refusé pour le schéma public`) ✅ |
 | `grafana_reader` : `DELETE FROM message` | refusé (`droit refusé pour la table message`) ✅ |
+
+## 8. Dashboard Grafana
+
+Le dashboard et la source de données sont provisionnés depuis le dépôt (Infrastructure as Code) : rien à recréer à la main.
+
+**Fichiers**
+
+| Fichier | Rôle |
+|---|---|
+| `docker-compose.grafana.yml` | Conteneur `minecom-grafana`, montages en lecture seule, variables lues depuis `.env` (`env_file`) |
+| `infra/grafana/provisioning/datasources/minecom-postgres.yml` | Source PostgreSQL, uid fixe `minecom-postgres` (`host.docker.internal:5433`, base `minecom`, `grafana_reader`, SSL désactivé) |
+| `infra/grafana/provisioning/dashboards/dashboards.yml` | Provider qui charge les JSON de `/var/lib/grafana/dashboards` dans le dossier `MineCom` |
+| `infra/grafana/dashboards/minecom-operations-securite.json` | Dashboard « MineCom - Opérations & Sécurité » (uid `minecom-ops`, schéma Grafana v2) |
+
+**Lancer**
+
+1. Renseigner dans `.env` : `GF_SECURITY_ADMIN_USER`, `GF_SECURITY_ADMIN_PASSWORD` et `GRAFANA_DB_PASSWORD` (voir `.env.example`).
+2. `docker compose -f docker-compose.grafana.yml up -d --force-recreate`
+3. Ouvrir <http://localhost:3000/d/minecom-ops> (dossier `MineCom`).
+
+**Modifier le dashboard** : la version provisionnée n'est pas modifiable depuis l'interface. Éditer une copie dans Grafana, l'exporter, remplacer le JSON dans `infra/grafana/dashboards/` en gardant `metadata.name: "minecom-ops"` et les références `"datasource": {"name": "minecom-postgres"}`, puis redémarrer le conteneur.
+
+**Vérifier**
+
+```bash
+curl -u "$GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD" "http://localhost:3000/api/search?query=MineCom"
+curl -u "$GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD" http://localhost:3000/api/datasources/uid/minecom-postgres/health
+```
